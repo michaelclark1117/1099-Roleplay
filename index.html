@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merchant Services Training Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #222;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0ede8; --muted: #888;
+    --accent: #c8f55a; --accent-dim: rgba(200,245,90,0.12);
+    --accent2: #f5a55a; --accent2-dim: rgba(245,165,90,0.12);
+    --danger: #ff6b6b; --danger-dim: rgba(255,107,107,0.12);
+    --teal: #4ecdc4; --teal-dim: rgba(78,205,196,0.12);
+    --purple: #b69cf5; --purple-dim: rgba(182,156,245,0.12);
+    --pink: #f5739a; --pink-dim: rgba(245,115,154,0.12);
+    --font: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; }
+
+  .hero { background: linear-gradient(135deg, #0f0f0f 0%, #1a1f0f 50%, #0f150f 100%); border-bottom: 1px solid var(--border); padding: 2.5rem 1.5rem 1.75rem; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content:''; position:absolute; top:-60px; left:50%; transform:translateX(-50%); width:400px; height:300px; background:radial-gradient(ellipse, rgba(200,245,90,0.07) 0%, transparent 70%); pointer-events:none; }
+  .hero-badge { display:inline-block; background:var(--accent-dim); border:1px solid rgba(200,245,90,0.3); color:var(--accent); font-size:11px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:1rem; }
+  .hero h1 { font-size:clamp(22px,4vw,34px); font-weight:600; line-height:1.2; margin-bottom:0.5rem; }
+  .hero h1 span { color:var(--accent); }
+  .hero p { font-size:14px; color:var(--muted); max-width:480px; margin:0 auto; line-height:1.6; }
+
+  .prog-nav { background:#141414; border-bottom:1px solid var(--border); display:flex; justify-content:center; gap:8px; padding:0.75rem 1rem; flex-wrap:wrap; }
+  .prog-btn { padding:8px 20px; font-size:13px; font-weight:500; border-radius:25px; border:1px solid var(--border2); cursor:pointer; background:transparent; color:var(--muted); font-family:var(--font); transition:all 0.15s; }
+  .prog-btn.active-field { background:var(--accent-dim); color:var(--accent); border-color:rgba(200,245,90,0.4); }
+  .prog-btn.active-bdr { background:var(--accent2-dim); color:var(--accent2); border-color:rgba(245,165,90,0.4); }
+
+  .nav-wrap { background:var(--surface); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:10; }
+  .nav { display:flex; max-width:900px; margin:0 auto; padding:0 1rem; overflow-x:auto; }
+  .nav-tab { padding:0.875rem 1.25rem; font-size:14px; font-weight:500; color:var(--muted); border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap; transition:all 0.15s; font-family:var(--font); }
+  .nav-tab:hover { color:var(--text); }
+  .nav-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .nav-tab.active-bdr-tab { color:var(--accent2); border-bottom-color:var(--accent2); }
+
+  .main { max-width:900px; margin:0 auto; padding:2rem 1.25rem; }
+  .program { display:none; }
+  .program.active { display:block; }
+  .section { display:none; }
+  .section.active { display:block; }
+
+  /* BUSINESS TYPE SELECTOR */
+  .biz-selector { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:1.5rem; }
+  .biz-btn { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.15s; }
+  .biz-btn:hover { border-color:var(--border2); }
+  .biz-btn.active-restaurant { background:rgba(200,245,90,0.08); border-color:rgba(200,245,90,0.4); }
+  .biz-btn.active-auto { background:rgba(78,205,196,0.08); border-color:rgba(78,205,196,0.4); }
+  .biz-btn.active-retail { background:rgba(182,156,245,0.08); border-color:rgba(182,156,245,0.4); }
+  .biz-btn.active-service { background:rgba(245,115,154,0.08); border-color:rgba(245,115,154,0.4); }
+  .biz-icon { font-size:24px; margin-bottom:6px; }
+  .biz-label { font-size:12px; font-weight:500; color:var(--muted); }
+  .biz-btn.active-restaurant .biz-label { color:var(--accent); }
+  .biz-btn.active-auto .biz-label { color:var(--teal); }
+  .biz-btn.active-retail .biz-label { color:var(--purple); }
+  .biz-btn.active-service .biz-label { color:var(--pink); }
+
+  .biz-content { display:none; }
+  .biz-content.active { display:block; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:1.5rem; margin-bottom:1rem; }
+  .card-header { display:flex; align-items:center; gap:10px; margin-bottom:1rem; }
+  .card h3 { font-size:15px; font-weight:600; color:var(--text); }
+  .card p, .card li { font-size:14px; color:var(--muted); line-height:1.7; }
+  .card ul { padding-left:1.25rem; }
+  .card li { margin-bottom:5px; }
+
+  .sn { width:28px; height:28px; border-radius:50%; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .sn-restaurant { background:var(--accent-dim); color:var(--accent); }
+  .sn-auto { background:var(--teal-dim); color:var(--teal); }
+  .sn-retail { background:var(--purple-dim); color:var(--purple); }
+  .sn-service { background:var(--pink-dim); color:var(--pink); }
+  .sn-bdr { background:var(--accent2-dim); color:var(--accent2); }
+
+  .script-box { border-radius:8px; padding:1rem 1.25rem; font-size:14px; line-height:1.7; font-style:italic; margin:0.75rem 0; }
+  .sb-restaurant { background:rgba(200,245,90,0.06); border:1px solid rgba(200,245,90,0.2); border-left:3px solid var(--accent); color:#d4ecb0; }
+  .sb-auto { background:rgba(78,205,196,0.06); border:1px solid rgba(78,205,196,0.2); border-left:3px solid var(--teal); color:#a0ddd9; }
+  .sb-retail { background:rgba(182,156,245,0.06); border:1px solid rgba(182,156,245,0.2); border-left:3px solid var(--purple); color:#d4c8f8; }
+  .sb-service { background:rgba(245,115,154,0.06); border:1px solid rgba(245,115,154,0.2); border-left:3px solid var(--pink); color:#f8c0d0; }
+  .sb-bdr { background:rgba(245,165,90,0.06); border:1px solid rgba(245,165,90,0.2); border-left:3px solid var(--accent2); color:#f5d4a0; }
+
+  .warn-box { background:var(--danger-dim); border:1px solid rgba(255,107,107,0.2); border-radius:8px; padding:0.75rem 1rem; font-size:13px; color:#ffaaaa; margin-top:0.5rem; }
+  .tip-box { background:var(--accent-dim); border:1px solid rgba(200,245,90,0.2); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.5rem; font-size:14px; color:#c8f55a; line-height:1.6; }
+  .tip-box-bdr { background:var(--accent2-dim); border:1px solid rgba(245,165,90,0.2); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; font-size:14px; color:var(--accent2); line-height:1.6; }
+  .rule-box { background:rgba(255,107,107,0.08); border:1px solid rgba(255,107,107,0.25); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; font-size:14px; color:#ffbbbb; line-height:1.6; }
+  .red-dot { width:8px; height:8px; border-radius:50%; background:var(--danger); flex-shrink:0; }
+  .push-box { background:rgba(255,107,107,0.06); border:1px solid rgba(255,107,107,0.2); border-left:3px solid var(--danger); border-radius:8px; padding:1rem 1.25rem; font-size:14px; color:#ffbbbb; line-height:1.7; font-style:italic; margin:0.5rem 0; }
+  .push-label { font-size:11px; font-weight:600; color:var(--danger); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
+  .try-label { font-size:11px; font-weight:600; color:var(--accent2); text-transform:uppercase; letter-spacing:0.08em; margin:0.75rem 0 4px; }
+
+  .formula { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:1rem; }
+  .formula-step { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:1rem; text-align:center; }
+  .formula-step .label { font-size:11px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.05em; }
+  .formula-step .word { font-size:16px; font-weight:600; color:var(--accent); }
+  .formula-step .word-bdr { font-size:16px; font-weight:600; color:var(--accent2); }
+  .formula-step .desc { font-size:12px; color:var(--muted); margin-top:4px; }
+
+  .phrase-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:1rem; }
+  .phrase { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.75rem 1rem; font-size:13px; color:var(--muted); line-height:1.5; font-style:italic; }
+
+  .api-banner { background:var(--surface2); border:1px solid rgba(200,245,90,0.25); border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; }
+  .api-banner-bdr { background:var(--surface2); border:1px solid rgba(245,165,90,0.25); border-radius:12px; padding:1.25rem; margin-bottom:1.25rem; }
+  .api-banner h4 { font-size:14px; font-weight:600; color:var(--accent); margin-bottom:4px; }
+  .api-banner-bdr h4 { font-size:14px; font-weight:600; color:var(--accent2); margin-bottom:4px; }
+  .api-banner p, .api-banner-bdr p { font-size:13px; color:var(--muted); margin-bottom:0.75rem; line-height:1.5; }
+  .api-banner a, .api-banner-bdr a { color:var(--accent); }
+  .api-row { display:flex; gap:8px; }
+  .api-row input { flex:1; padding:9px 14px; font-size:14px; border-radius:8px; border:1px solid var(--border2); background:var(--surface); color:var(--text); font-family:var(--font); outline:none; }
+  .api-save-btn { padding:9px 18px; background:var(--accent); color:#0f0f0f; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font); white-space:nowrap; }
+  .api-save-btn-bdr { padding:9px 18px; background:var(--accent2); color:#0f0f0f; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font); white-space:nowrap; }
+  .api-status { font-size:12px; margin-top:6px; color:var(--muted); }
+  .api-status.ok { color:var(--teal); }
+  .api-status.err { color:var(--danger); }
+
+  .rp-wrap { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+  .rp-header { padding:1rem 1.25rem; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .rp-header h3 { font-size:15px; font-weight:600; flex:1; }
+  .persona-pill { font-size:12px; padding:4px 12px; border-radius:20px; }
+  .pp-restaurant { background:var(--accent-dim); color:var(--accent); border:1px solid rgba(200,245,90,0.25); }
+  .pp-auto { background:var(--teal-dim); color:var(--teal); border:1px solid rgba(78,205,196,0.25); }
+  .pp-retail { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(182,156,245,0.25); }
+  .pp-service { background:var(--pink-dim); color:var(--pink); border:1px solid rgba(245,115,154,0.25); }
+  .pp-bdr { background:var(--accent2-dim); color:var(--accent2); border:1px solid rgba(245,165,90,0.25); }
+  .reset-btn { padding:6px 12px; background:transparent; border:1px solid var(--border2); border-radius:8px; font-size:13px; cursor:pointer; color:var(--muted); font-family:var(--font); }
+
+  .scenario-bar { display:flex; gap:6px; padding:0.75rem 1.25rem; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+  .sc-btn { padding:5px 12px; font-size:12px; border-radius:20px; border:1px solid var(--border2); cursor:pointer; background:transparent; color:var(--muted); font-family:var(--font); transition:all 0.15s; }
+  .sc-btn.active { background:var(--accent-dim); color:var(--accent); border-color:rgba(200,245,90,0.4); }
+  .sc-btn.active-auto { background:var(--teal-dim); color:var(--teal); border-color:rgba(78,205,196,0.4); }
+  .sc-btn.active-retail { background:var(--purple-dim); color:var(--purple); border-color:rgba(182,156,245,0.4); }
+  .sc-btn.active-service { background:var(--pink-dim); color:var(--pink); border-color:rgba(245,115,154,0.4); }
+  .sc-btn.active-bdr { background:var(--accent2-dim); color:var(--accent2); border-color:rgba(245,165,90,0.4); }
+
+  .chat-area { height:380px; overflow-y:auto; padding:1.25rem; display:flex; flex-direction:column; gap:10px; }
+  .chat-area::-webkit-scrollbar { width:4px; }
+  .chat-area::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
+  .msg { max-width:80%; padding:0.7rem 1rem; border-radius:14px; font-size:14px; line-height:1.6; }
+  .msg.customer { background:var(--surface2); color:var(--text); align-self:flex-start; border-bottom-left-radius:4px; border:1px solid var(--border); }
+  .msg.rep { background:var(--accent-dim); color:#d4ecb0; border:1px solid rgba(200,245,90,0.2); align-self:flex-end; border-bottom-right-radius:4px; }
+  .msg.rep-bdr { background:var(--accent2-dim); color:#f5d4a0; border:1px solid rgba(245,165,90,0.2); align-self:flex-end; border-bottom-right-radius:4px; }
+  .msg.system { background:transparent; color:var(--muted); font-size:12px; text-align:center; align-self:center; font-style:italic; }
+  .msg.coach { background:rgba(78,205,196,0.08); border:1px solid rgba(78,205,196,0.2); color:#a0ddd9; align-self:stretch; max-width:100%; font-size:13px; border-radius:10px; padding:0.75rem 1rem; }
+  .coach-label { font-size:11px; font-weight:600; color:var(--teal); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; }
+
+  .chat-footer { padding:0.875rem 1.25rem; border-top:1px solid var(--border); display:flex; gap:8px; }
+  .chat-footer input { flex:1; padding:10px 14px; font-size:14px; border-radius:10px; border:1px solid var(--border2); background:var(--surface2); color:var(--text); font-family:var(--font); outline:none; }
+  .send-btn { padding:10px 20px; background:var(--accent); color:#0f0f0f; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font); }
+  .send-btn-bdr { padding:10px 20px; background:var(--accent2); color:#0f0f0f; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font); }
+  .send-btn:disabled, .send-btn-bdr:disabled { opacity:0.4; cursor:not-allowed; }
+  .typing { display:flex; gap:5px; align-items:center; padding:0.7rem 1rem; background:var(--surface2); border:1px solid var(--border); border-radius:14px; border-bottom-left-radius:4px; align-self:flex-start; }
+  .typing span { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:bounce 1.2s infinite; }
+  .typing span:nth-child(2){animation-delay:0.2s} .typing span:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+  @media(max-width:600px){
+    .biz-selector{grid-template-columns:repeat(2,1fr)}
+    .formula{grid-template-columns:repeat(2,1fr)}
+    .phrase-grid{grid-template-columns:1fr}
+    .api-row{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Sales Training Hub</div>
+  <h1>Merchant Services<br><span>Training Center</span></h1>
+  <p>Practice scripts, crush objections, and never hang up without a commitment.</p>
+</div>
+
+<div class="prog-nav">
+  <button class="prog-btn active-field" onclick="showProgram('field',this)">🏪 Field Rep — Walk-In Training</button>
+  <button class="prog-btn" onclick="showProgram('bdr',this)">📞 BDR — Cold Call Training</button>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav">
+    <button class="nav-tab active" id="tab1">Scenario Guide</button>
+    <button class="nav-tab" id="tab2">Objection Playbook</button>
+    <button class="nav-tab" id="tab3">AI Role Play</button>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== FIELD REP ===== -->
+<div id="field" class="program active">
+
+  <!-- SCENARIO -->
+  <div id="scenario" class="section active">
+    <div class="biz-selector">
+      <div class="biz-btn active-restaurant" onclick="setBiz('restaurant',this)"><div class="biz-icon">🍽️</div><div class="biz-label">Restaurant</div></div>
+      <div class="biz-btn" onclick="setBiz('auto',this)"><div class="biz-icon">🔧</div><div class="biz-label">Auto Repair</div></div>
+      <div class="biz-btn" onclick="setBiz('retail',this)"><div class="biz-icon">🛍️</div><div class="biz-label">Retail Store</div></div>
+      <div class="biz-btn" onclick="setBiz('service',this)"><div class="biz-icon">💇</div><div class="biz-label">Salon / Spa</div></div>
+    </div>
+
+    <!-- RESTAURANT -->
+    <div id="biz-restaurant" class="biz-content active">
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">🍽️ The cold walk-in — Restaurant Owner "Maria"</h3>
+        <p style="margin-bottom:0.75rem;">Mid-afternoon, slow period. Maria is wiping down the counter when you walk in.</p>
+        <ul>
+          <li>Pays $400–$500/month in fees, never closely reviewed her statement</li>
+          <li>Polite but skeptical — has been pitched before</li>
+          <li>Main fear: disruption to daily operations and hassle of switching</li>
+          <li>Motivated by saving money and keeping things simple</li>
+        </ul>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-restaurant">1</div><h3>The introduction</h3></div>
+        <div class="script-box sb-restaurant">"Hi Maria, my name is [Name] with [Company]. I work with local restaurants on their credit card processing — I just need 2 minutes to show you something that could save you a few hundred dollars a month. Is now okay?"</div>
+        <div class="warn-box"><strong>Mistake:</strong> Pitching before building any rapport.</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-restaurant">2</div><h3>The statement review</h3></div>
+        <div class="script-box sb-restaurant">"Most restaurant owners I talk to are overpaying without realizing it — it's buried in the fees. Let me take a quick look at your last statement. 60 seconds and I'll tell you if there's savings there."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-restaurant">3</div><h3>Handle switching objection</h3></div>
+        <div class="script-box sb-restaurant">"I completely get it — we handle everything. Terminal swap takes 10 minutes, money still deposits next business day. Most owners say they wish they'd done it sooner."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-restaurant">4</div><h3>The close</h3></div>
+        <div class="script-box sb-restaurant">"Let me fill out a quick one-page application for a free savings analysis. No obligation, no switching yet — just gets the ball rolling. Sound fair?"</div>
+      </div>
+    </div>
+
+    <!-- AUTO REPAIR -->
+    <div id="biz-auto" class="biz-content">
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">🔧 The cold walk-in — Auto Repair Shop Owner "Mike"</h3>
+        <p style="margin-bottom:0.75rem;">Mike is in the shop or at the front desk. He's busy, grease on his hands, and doesn't have time for salespeople.</p>
+        <ul>
+          <li>Runs a 3–5 bay shop, high ticket transactions ($500–$2,000+ per job)</li>
+          <li>Pays significant processing fees but doesn't think about them</li>
+          <li>Direct and no-nonsense — gets to the point fast or loses interest</li>
+          <li>Motivated by numbers — show him real dollars saved, not percentages</li>
+        </ul>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-auto">1</div><h3>The introduction</h3></div>
+        <div class="script-box sb-auto">"Hey Mike, real quick — I work with auto shops in the area on their processing fees. With the size of jobs you're running, most shops I talk to are leaving $300–$500 a month on the table. I just need 2 minutes. Got a second?"</div>
+        <div class="warn-box"><strong>Mistake:</strong> Being too polished or salesy — Mike respects direct, confident, and fast.</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-auto">2</div><h3>The hook — use his ticket size</h3></div>
+        <div class="script-box sb-auto">"Your average ticket is probably $500–$1,500 right? Every time a customer swipes, you're losing 2–3% of that to your processor. On a $1,000 job that's $20–$30 gone. Let me pull up your statement and show you exactly what you're paying."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-auto">3</div><h3>Handle the busy objection</h3></div>
+        <div class="script-box sb-auto">"I hear you — I'll make it fast. Show me last month's statement and I can tell you in 60 seconds if it's worth talking about. If not, I'm out the door and you never see me again."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-auto">4</div><h3>The close</h3></div>
+        <div class="script-box sb-auto">"Here's what I need — one-page application and your last statement. No obligation, no switching today. I'll get you a full side-by-side comparison and you decide from there. Fair enough?"</div>
+      </div>
+    </div>
+
+    <!-- RETAIL -->
+    <div id="biz-retail" class="biz-content">
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">🛍️ The cold walk-in — Retail Store Owner "Sandra"</h3>
+        <p style="margin-bottom:0.75rem;">Sandra is behind the counter or on the floor. She runs a clothing, gift, or specialty retail shop and processes dozens of transactions a day.</p>
+        <ul>
+          <li>High volume of small transactions — fees add up fast</li>
+          <li>Often unaware of how interchange fees work</li>
+          <li>Worried about her terminal going down during a sale</li>
+          <li>Motivated by reliability, simplicity, and monthly savings</li>
+        </ul>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-retail">1</div><h3>The introduction</h3></div>
+        <div class="script-box sb-retail">"Hi Sandra, I'm [Name] with [Company]. I work with retail stores in the area on their payment processing. With how many transactions you're running every day, there's a good chance you're overpaying and don't know it. Do you have 2 minutes?"</div>
+        <div class="warn-box"><strong>Mistake:</strong> Walking in during a rush — read the room and come back during slow periods.</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-retail">2</div><h3>The volume angle</h3></div>
+        <div class="script-box sb-retail">"With retail, it's all about volume. Even a small reduction in your rate adds up to real money at the end of the month. If you're doing 200 transactions a day and overpaying even $0.05 per swipe — that's $300 a month you're leaving on the table."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-retail">3</div><h3>Handle reliability concern</h3></div>
+        <div class="script-box sb-retail">"I completely understand — the last thing you want is your terminal going down on a Saturday afternoon. Our equipment has 99.9% uptime and we have 24/7 support. Most clients say the switch was smoother than they expected."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-retail">4</div><h3>The close</h3></div>
+        <div class="script-box sb-retail">"Let me take a look at your statement and put together a real comparison. No switching today — I just want to show you the numbers side by side. If it makes sense, great. If not, no hard feelings. Can we do that?"</div>
+      </div>
+    </div>
+
+    <!-- SERVICE -->
+    <div id="biz-service" class="biz-content">
+      <div class="card">
+        <h3 style="margin-bottom:0.75rem;">💇 The cold walk-in — Salon / Spa Owner "Jennifer"</h3>
+        <p style="margin-bottom:0.75rem;">Jennifer owns a hair salon, nail spa, or similar service business. She's either with a client or at the front desk scheduling.</p>
+        <ul>
+          <li>Tips are a big part of transactions — tip handling is a key concern</li>
+          <li>Pays $200–$400/month in fees, often on a flat-rate program</li>
+          <li>Relationship-driven — she values trust and personal service</li>
+          <li>Motivated by saving money AND having a processor that handles tips seamlessly</li>
+        </ul>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-service">1</div><h3>The introduction</h3></div>
+        <div class="script-box sb-service">"Hi Jennifer, I'm [Name] with [Company]. I work with salons and spas in the area on their payment processing — specifically making sure tips get handled right and owners aren't overpaying on fees. Do you have just 2 minutes?"</div>
+        <div class="warn-box"><strong>Mistake:</strong> Interrupting when she's with a client — always ask a front desk person first.</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-service">2</div><h3>The tip angle</h3></div>
+        <div class="script-box sb-service">"A lot of salon owners on flat-rate programs are actually paying fees on the tip amount too — which means your stylists' tips are costing you money. Let me take a look at your statement and see if that's happening."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-service">3</div><h3>Handle the trust objection</h3></div>
+        <div class="script-box sb-service">"I totally understand — you've built relationships with your clients and your vendors. I'm not asking you to throw that away. Just let me show you the numbers. If what you have is better, I'll respect that and walk out."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="sn sn-service">4</div><h3>The close</h3></div>
+        <div class="script-box sb-service">"Here's what I'd love to do — grab your last processing statement and let me put together a free side-by-side. I'll show you exactly what you're paying, what we can offer, and you make the call. No pressure at all."</div>
+      </div>
+    </div>
+  </div><!-- end scenario -->
+
+  <!-- OBJECTIONS -->
+  <div id="objections" class="section">
+    <div class="tip-box">Use <strong>Feel → Felt → Found → Close</strong> on every objection. Validate, relate, reframe, then ask for a small yes.</div>
+
+    <div class="biz-selector">
+      <div class="biz-btn active-restaurant" id="obj-biz-restaurant" onclick="setObjBiz('restaurant',this)"><div class="biz-icon">🍽️</div><div class="biz-label">Restaurant</div></div>
+      <div class="biz-btn" id="obj-biz-auto" onclick="setObjBiz('auto',this)"><div class="biz-icon">🔧</div><div class="biz-label">Auto Repair</div></div>
+      <div class="biz-btn" id="obj-biz-retail" onclick="setObjBiz('retail',this)"><div class="biz-icon">🛍️</div><div class="biz-label">Retail Store</div></div>
+      <div class="biz-btn" id="obj-biz-service" onclick="setObjBiz('service',this)"><div class="biz-icon">💇</div><div class="biz-label">Salon / Spa</div></div>
+    </div>
+
+    <div id="obj-restaurant" class="biz-content active">
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm happy with my current processor"</h3></div>
+        <div class="script-box sb-restaurant">"Most of my best clients said the same thing — until we looked at their statement and found they were overpaying. Let me take 60 seconds. If your rate is solid, I'll tell you honestly."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I don't have time"</h3></div>
+        <div class="script-box sb-restaurant">"I'll keep it to 3 minutes. I'm not asking you to switch anything — just look at one number with me. Fair enough?"</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I need to talk to my partner"</h3></div>
+        <div class="script-box sb-restaurant">"Let me fill out the application now so you have real numbers when you talk to them. No obligation — just gives you both something concrete to look at together."</div>
+      </div>
+    </div>
+
+    <div id="obj-auto" class="biz-content">
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm happy with who I have"</h3></div>
+        <div class="script-box sb-auto">"Happy is great — but with ticket sizes like yours, even a 0.5% difference is $500+ a month. Let me look at your statement and show you the actual dollar amount. If it's nothing, I'm out the door."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm too busy right now"</h3></div>
+        <div class="script-box sb-auto">"I respect that — I'll be in and out in 3 minutes. Just show me last month's statement. I can tell you right here if it's worth a longer conversation."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I just switched processors"</h3></div>
+        <div class="script-box sb-auto">"Good timing actually — a lot of shops switch and still end up overpaying because they didn't know what to compare. Let me verify you got a real deal. Show me the statement."</div>
+      </div>
+    </div>
+
+    <div id="obj-retail" class="biz-content">
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"My equipment is leased, I can't switch"</h3></div>
+        <div class="script-box sb-retail">"Totally understandable — let me look at your lease terms. A lot of times the savings more than cover any buyout costs. And in some cases we can work around the lease completely. Can I see your statement?"</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm worried about downtime"</h3></div>
+        <div class="script-box sb-retail">"That's the #1 concern I hear and it's completely valid. We have 99.9% uptime, next-day terminal replacement if anything goes wrong, and 24/7 live support. The switch itself takes about 15 minutes."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I don't have time to deal with this"</h3></div>
+        <div class="script-box sb-retail">"That's exactly why I handle everything — you don't have to deal with a thing. All I need is your statement and a signature. We take it from there."</div>
+      </div>
+    </div>
+
+    <div id="obj-service" class="biz-content">
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"My staff is used to the current system"</h3></div>
+        <div class="script-box sb-service">"I completely get that — training disruption is real. Our terminals are intuitive and we do on-site setup and training. Most stylists pick it up in 5 minutes. And tips get processed even cleaner."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm on a flat rate, it's simple"</h3></div>
+        <div class="script-box sb-service">"Flat rate sounds simple but it's usually the most expensive option for salons. You're paying the same rate on a $20 service as a $200 color job. Let me show you what an interchange-plus model would save you monthly."</div>
+      </div>
+      <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I need to think about it"</h3></div>
+        <div class="script-box sb-service">"Of course — here's what I'd suggest: let me get the application started so I can put the real numbers in front of you. That way you're thinking about actual savings, not guesses. No obligation at all."</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:1rem;">
+      <h3 style="margin-bottom:1rem;">Universal disarm formula</h3>
+      <div class="formula">
+        <div class="formula-step"><div class="label">Step 1</div><div class="word">Feel</div><div class="desc">Validate them</div></div>
+        <div class="formula-step"><div class="label">Step 2</div><div class="word">Felt</div><div class="desc">Relate to others</div></div>
+        <div class="formula-step"><div class="label">Step 3</div><div class="word">Found</div><div class="desc">Reframe it</div></div>
+        <div class="formula-step"><div class="label">Step 4</div><div class="word">Close</div><div class="desc">Micro-yes ask</div></div>
+      </div>
+    </div>
+  </div><!-- end objections -->
+
+  <!-- FIELD ROLE PLAY -->
+  <div id="roleplay" class="section">
+    <div class="api-banner">
+      <h4>One-time setup — API key required</h4>
+      <p>Powered by Claude AI. Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> and paste it below.</p>
+      <div class="api-row">
+        <input type="password" id="fieldApiKey" placeholder="sk-ant-api03-..." />
+        <button class="api-save-btn" onclick="saveKey('field')">Save Key</button>
+      </div>
+      <div class="api-status" id="fieldApiStatus"></div>
+    </div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;">Choose a business type and scenario. You are the rep walking in. Get real-time coaching after every exchange.</p>
+    <div class="rp-wrap">
+      <div class="rp-header">
+        <h3>Live walk-in practice</h3>
+        <span class="persona-pill pp-restaurant" id="fieldPersonaPill">Maria — Restaurant Owner</span>
+        <button class="reset-btn" onclick="resetChat('field')">Restart</button>
+      </div>
+      <div class="scenario-bar" id="fieldScenarioBar">
+        <button class="sc-btn active" onclick="setScenario('field','restaurant_cold',this)">🍽️ Restaurant</button>
+        <button class="sc-btn" onclick="setScenario('field','auto_cold',this)">🔧 Auto Repair</button>
+        <button class="sc-btn" onclick="setScenario('field','retail_cold',this)">🛍️ Retail Store</button>
+        <button class="sc-btn" onclick="setScenario('field','service_cold',this)">💇 Salon/Spa</button>
+        <button class="sc-btn" onclick="setScenario('field','restaurant_happy',this)">🍽️ "Happy with processor"</button>
+        <button class="sc-btn" onclick="setScenario('field','auto_busy',this)">🔧 "Too busy"</button>
+        <button class="sc-btn" onclick="setScenario('field','retail_lease',this)">🛍️ "Equipment leased"</button>
+        <button class="sc-btn" onclick="setScenario('field','service_flat',this)">💇 "On flat rate"</button>
+      </div>
+      <div class="chat-area" id="fieldChat"></div>
+      <div class="chat-footer">
+        <input type="text" id="fieldInput" placeholder="Type your response as the rep..." onkeydown="if(event.key==='Enter')sendMsg('field')" />
+        <button class="send-btn" id="fieldSendBtn" onclick="sendMsg('field')">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end field -->
+
+<!-- ===== BDR ===== -->
+<div id="bdr" class="program">
+
+  <div id="bdr-scenario" class="section active">
+    <div class="rule-box">🔥 <strong>The #1 Rule:</strong> Never hang up without a commitment. Every call ends with a statement sent, a callback scheduled, or a promise to send it. There is no other outcome.</div>
+    <div class="tip-box-bdr">📞 <strong>Your only goal:</strong> Get the merchant to send their processing statement — text, email, or fax. Whatever is easiest. Don't sell. Just get the statement.</div>
+    <div class="card">
+      <h3 style="margin-bottom:0.75rem;">The cold call — "Tony, Auto Shop Owner"</h3>
+      <p style="margin-bottom:0.75rem;">200 calls a day. Tony is always busy. He will push back every time. Push right back — politely but relentlessly.</p>
+      <ul>
+        <li>Owns a 3-bay shop, 8 years in business</li>
+        <li>Has a processor, never really looked at his fees</li>
+        <li>Direct and busy — respects confidence and speed</li>
+        <li>Will send the statement if you give him a reason AND make it effortless</li>
+      </ul>
+    </div>
+    <div class="card"><div class="card-header"><div class="sn sn-bdr">1</div><h3>The opening — first 10 seconds</h3></div>
+      <div class="script-box sb-bdr">"Hey Tony, this is [Name] with [Company]. Super quick — I help auto shops get a free side-by-side comparison on their processing fees. I just need your last statement. Can you text me a photo, email it, or fax it over?"</div>
+      <div class="warn-box"><strong>Never open with:</strong> "How are you today?" — Tony hangs up immediately.</div>
+    </div>
+    <div class="card"><div class="card-header"><div class="sn sn-bdr">2</div><h3>When he pushes back — stay on the line</h3></div>
+      <div class="script-box sb-bdr">"I hear you Tony — this is 20 seconds on your end. Snap a photo of your statement and text it to [number]. That's it. I do everything else. Auto shops in your area are saving $200–$400 a month. Can you do that right now?"</div>
+    </div>
+    <div class="card"><div class="card-header"><div class="sn sn-bdr">3</div><h3>The commitment close — never hang up empty</h3></div>
+      <div class="script-box sb-bdr">"Tony when's a better time — can I call back in an hour? Tonight? First thing tomorrow? I just need 2 minutes and I promise it'll be worth it."</div>
+      <p style="margin-top:0.75rem;margin-bottom:0.5rem;">Last resort before hanging up:</p>
+      <div class="script-box sb-bdr">"No problem. I'm texting you my number right now. When you get a free second — snap a photo of that statement and send it my way. Completely free. You've got nothing to lose."</div>
+    </div>
+  </div>
+
+  <div id="bdr-objections" class="section">
+    <div class="rule-box">🔥 <strong>BDR Mindset:</strong> Every objection is just Tony being busy. It is NOT a no. Push through every single time. Always end with the statement ask. Never hang up without a commitment.</div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm too busy right now"</h3></div>
+      <p style="margin-bottom:0.5rem;font-size:14px;color:var(--muted);"><strong>They ALL say this. Every call. Push through it.</strong></p>
+      <div class="try-label">Try 1 — Make it tiny</div>
+      <div class="script-box sb-bdr">"Tony I promise this is 20 seconds. Snap a photo of your statement and text it to [number]. You can do that right now while we're talking."</div>
+      <div class="try-label">Try 2 — Create urgency</div>
+      <div class="script-box sb-bdr">"Auto shops in your area are saving $200–$400 a month. You're either one of them or you're not — the statement tells us which. 20 seconds."</div>
+      <div class="try-label">Try 3 — Lock in callback</div>
+      <div class="script-box sb-bdr">"Alright Tony — when's better? An hour from now, tonight, or first thing tomorrow?"</div>
+      <div class="push-label" style="margin-top:0.75rem;">Never do this:</div>
+      <div class="push-box">"No problem, I'll let you go." — Always get a commitment first.</div>
+    </div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm happy with who I have"</h3></div>
+      <div class="try-label">Try 1 — Challenge it</div>
+      <div class="script-box sb-bdr">"Happy and overpaying aren't mutually exclusive. Most shop owners are happy AND paying $300 more than they need to. The statement tells the truth — just send it over."</div>
+      <div class="try-label">Try 2 — No risk angle</div>
+      <div class="script-box sb-bdr">"I'm not asking you to switch anything. If your rate is great, I'll be the first to tell you — and you never hear from me again. Send me that statement."</div>
+      <div class="try-label">Try 3 — Push harder</div>
+      <div class="script-box sb-bdr">"Tony — what do you have to lose? It's free. 20 seconds. If I'm wrong, you feel great about your processor. If I'm right, you save hundreds a month. Text it to [number] right now."</div>
+    </div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I just switched processors"</h3></div>
+      <div class="try-label">Try 1 — Perfect timing</div>
+      <div class="script-box sb-bdr">"Perfect timing — a lot of shops switch and still overpay because they didn't know what to compare against. Let me verify you got a good deal. Send me that first statement."</div>
+      <div class="try-label">Try 2 — Peace of mind</div>
+      <div class="script-box sb-bdr">"You just made a big decision — don't you want to know for sure it was the right one? 20 seconds, snap a photo, text it to me."</div>
+      <div class="try-label">Try 3 — Future callback</div>
+      <div class="script-box sb-bdr">"At minimum let me call you back in 30 days when your first statement comes in. Can I have your direct number?"</div>
+    </div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"Not interested"</h3></div>
+      <div class="try-label">Try 1 — Reframe</div>
+      <div class="script-box sb-bdr">"I'm not asking you to be interested in switching — just interested in knowing if you're overpaying. Two different things. Send me the statement."</div>
+      <div class="try-label">Try 2 — Direct push</div>
+      <div class="script-box sb-bdr">"If I could show you you're paying $300 more than you need to every month — would you want to know that? Of course you would. That's all I'm doing. Text me the statement."</div>
+      <div class="try-label">Try 3 — Beg for 20 seconds</div>
+      <div class="script-box sb-bdr">"Tony — I make 200 calls a day and I wouldn't push this hard if I didn't believe there's money on the table. Give me 20 seconds. Snap a photo. Text it to [number]. That's all."</div>
+    </div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"My brother / partner handles it"</h3></div>
+      <div class="try-label">Try 1 — Get the contact</div>
+      <div class="script-box sb-bdr">"Perfect — what's the best way to reach him? I can call, text, or email. Can you give me his number?"</div>
+      <div class="try-label">Try 2 — Warm handoff</div>
+      <div class="script-box sb-bdr">"Any chance you could put him on right now? It'll take 2 minutes and you guys could be saving real money every month."</div>
+      <div class="try-label">Try 3 — Get Tony to send it</div>
+      <div class="script-box sb-bdr">"Tony, the statement is just a piece of paper — it's not a financial decision. Can you snap a photo of it real quick? I'll reach out to your brother with the full analysis."</div>
+    </div>
+
+    <div class="card"><div class="card-header"><div class="red-dot"></div><h3>"I'm already paying $0 — I'm on a cash discount program"</h3></div>
+      <p style="margin-bottom:0.75rem;font-size:14px;color:var(--muted);">A cash discount program passes processing fees to the customer as a service fee, so the merchant pays $0 in processing costs. <strong style="color:var(--text);">This is real — don't argue it.</strong> Your angle is NOT to say they're wrong. Your angle is to show them they could still be on a better cash discount program, OR that the program is costing them customers and sales.</p>
+      <div class="try-label">Try 1 — Validate + upgrade angle</div>
+      <div class="script-box sb-bdr">"That's great Tony — cash discount is smart. The question is whether you're on the best version of it. A lot of shops on cash discount are still paying monthly fees, PCI fees, and equipment costs that eat into that $0. Let me look at your full statement and make sure you're actually getting what you were promised."</div>
+      <div class="try-label">Try 2 — Customer experience angle</div>
+      <div class="script-box sb-bdr">"I hear you — and cash discount works great for a lot of shops. One thing worth looking at is whether that service fee on the customer's end is compliant and clearly disclosed. Some programs set it up in a way that creates chargebacks or customer complaints. Send me the statement and I can tell you in 60 seconds if yours is set up right."</div>
+      <div class="try-label">Try 3 — Total cost angle</div>
+      <div class="script-box sb-bdr">"Tony I respect that — $0 on processing is a big deal. I just want to make sure it's actually $0 all in. Equipment lease, monthly minimums, statement fees, PCI non-compliance fees — those can add up to $100–$200 a month even on a cash discount program. Send me the statement and let's verify."</div>
+      <div class="warn-box"><strong>Key point for BDRs:</strong> Cash discount IS real and the merchant IS saving on swipe fees. Never tell them they're wrong. Your job is to find the hidden costs OR show them a better program. Always get the statement — that's where you find the real numbers.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:1rem;">The BDR relentless formula</h3>
+      <div class="formula">
+        <div class="formula-step"><div class="label">Step 1</div><div class="word-bdr">Hear</div><div class="desc">Acknowledge briefly</div></div>
+        <div class="formula-step"><div class="label">Step 2</div><div class="word-bdr">Push</div><div class="desc">Don't accept it</div></div>
+        <div class="formula-step"><div class="label">Step 3</div><div class="word-bdr">Ask</div><div class="desc">Statement ask again</div></div>
+        <div class="formula-step"><div class="label">Step 4</div><div class="word-bdr">Commit</div><div class="desc">Lock in something</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="margin-bottom:0.75rem;">BDR power phrases</h3>
+      <div class="phrase-grid">
+        <div class="phrase">"20 seconds — snap a photo and text it to me."</div>
+        <div class="phrase">"What do you have to lose? It's completely free."</div>
+        <div class="phrase">"I wouldn't push this hard if there wasn't money here."</div>
+        <div class="phrase">"Happy and overpaying are not the same thing."</div>
+        <div class="phrase">"Text, email, or fax — whatever is easiest."</div>
+        <div class="phrase">"If I'm wrong you never hear from me again."</div>
+        <div class="phrase">"Shops in your area are saving $200–$400 a month."</div>
+        <div class="phrase">"An hour from now or first thing tomorrow — which works?"</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bdr-roleplay" class="section">
+    <div class="api-banner-bdr">
+      <h4>One-time setup — API key required</h4>
+      <p>Powered by Claude AI. Get a free key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> and paste below.</p>
+      <div class="api-row">
+        <input type="password" id="bdrApiKey" placeholder="sk-ant-api03-..." />
+        <button class="api-save-btn-bdr" onclick="saveKey('bdr')">Save Key</button>
+      </div>
+      <div class="api-status" id="bdrApiStatus"></div>
+    </div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;">You are the BDR. Tony just picked up. Push through every objection. Never hang up without a commitment. Coach rates your persistence 1–10 after every exchange.</p>
+    <div class="rp-wrap">
+      <div class="rp-header">
+        <h3>Live call practice — BDR</h3>
+        <span class="persona-pill pp-bdr">Tony — Auto Shop Owner</span>
+        <button class="reset-btn" onclick="resetChat('bdr')">Restart</button>
+      </div>
+      <div class="scenario-bar">
+        <button class="sc-btn active-bdr" onclick="setScenario('bdr','cold',this)">Cold call</button>
+        <button class="sc-btn" onclick="setScenario('bdr','busy',this)">"I'm busy"</button>
+        <button class="sc-btn" onclick="setScenario('bdr','happy',this)">"I'm happy"</button>
+        <button class="sc-btn" onclick="setScenario('bdr','switched',this)">"Just switched"</button>
+        <button class="sc-btn" onclick="setScenario('bdr','notinterested',this)">"Not interested"</button>
+        <button class="sc-btn" onclick="setScenario('bdr','brother',this)">"Brother handles it"</button>
+        <button class="sc-btn" onclick="setScenario('bdr','zerofee',this)">"On cash discount"</button>
+      </div>
+      <div class="chat-area" id="bdrChat"></div>
+      <div class="chat-footer">
+        <input type="text" id="bdrInput" placeholder="Type what you say on the call..." onkeydown="if(event.key==='Enter')sendMsg('bdr')" />
+        <button class="send-btn-bdr" id="bdrSendBtn" onclick="sendMsg('bdr')">Send</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end bdr -->
+</div><!-- end main -->
+
+<script>
+let currentProgram='field';
+let currentBiz='restaurant';
+let currentObjBiz='restaurant';
+
+function showProgram(prog,btn){
+  currentProgram=prog;
+  document.querySelectorAll('.program').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.prog-btn').forEach(b=>b.classList.remove('active-field','active-bdr'));
+  document.getElementById(prog).classList.add('active');
+  btn.classList.add(prog==='field'?'active-field':'active-bdr');
+  const prefix=prog==='bdr'?'bdr-':'';
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(prefix+'scenario').classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active','active-bdr-tab'));
+  document.getElementById('tab1').classList.add('active');
+  bindTabs(prog);
+}
+
+function bindTabs(prog){
+  const prefix=prog==='bdr'?'bdr-':'';
+  const cls=prog==='bdr'?'active-bdr-tab':'active';
+  document.getElementById('tab1').onclick=()=>showTab(prefix+'scenario',document.getElementById('tab1'),cls);
+  document.getElementById('tab2').onclick=()=>showTab(prefix+'objections',document.getElementById('tab2'),cls);
+  document.getElementById('tab3').onclick=()=>showTab(prefix+'roleplay',document.getElementById('tab3'),cls);
+}
+function showTab(id,btn,cls){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active','active-bdr-tab'));
+  btn.classList.add(cls||'active');
+}
+bindTabs('field');
+
+function setBiz(biz,btn){
+  currentBiz=biz;
+  document.querySelectorAll('#scenario .biz-btn').forEach(b=>b.classList.remove('active-restaurant','active-auto','active-retail','active-service'));
+  btn.classList.add('active-'+biz);
+  document.querySelectorAll('#scenario .biz-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('biz-'+biz).classList.add('active');
+}
+function setObjBiz(biz,btn){
+  currentObjBiz=biz;
+  document.querySelectorAll('#objections .biz-btn').forEach(b=>b.classList.remove('active-restaurant','active-auto','active-retail','active-service'));
+  btn.classList.add('active-'+biz);
+  document.querySelectorAll('#objections .biz-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('obj-'+biz).classList.add('active');
+}
+
+let keys={field:'',bdr:''};
+function saveKey(prog){
+  const val=document.getElementById(prog+'ApiKey').value.trim();
+  if(!val.startsWith('sk-ant-')){setStatus(prog,'Invalid key — should start with sk-ant-','err');return;}
+  keys[prog]=val;
+  try{localStorage.setItem('key_'+prog,val);}catch(e){}
+  setStatus(prog,'Key saved! Ready to practice.','ok');
+}
+function setStatus(prog,msg,type){
+  const el=document.getElementById(prog+'ApiStatus');
+  if(el){el.textContent=msg;el.className='api-status '+(type||'');}
+}
+
+const personas={
+  restaurant_cold:{pill:'Maria — Restaurant Owner',cls:'pp-restaurant'},
+  restaurant_happy:{pill:'Maria — Restaurant Owner',cls:'pp-restaurant'},
+  auto_cold:{pill:'Mike — Auto Shop Owner',cls:'pp-auto'},
+  auto_busy:{pill:'Mike — Auto Shop Owner',cls:'pp-auto'},
+  retail_cold:{pill:'Sandra — Retail Store Owner',cls:'pp-retail'},
+  retail_lease:{pill:'Sandra — Retail Store Owner',cls:'pp-retail'},
+  service_cold:{pill:'Jennifer — Salon Owner',cls:'pp-service'},
+  service_flat:{pill:'Jennifer — Salon Owner',cls:'pp-service'},
+};
+
+const scenarios={
+  field:{
+    restaurant_cold:`You are Maria, a polite but skeptical restaurant owner. A merchant services rep just walked in cold. Start with "Hi there, can I help you?" After each rep message reply as Maria (2-3 sentences) then write "COACH:" — one thing done well and one improvement.`,
+    restaurant_happy:`You are Maria, happy with her current processor. Start with "I'm happy with my current processor." Push back but be polite. After each rep message reply as Maria then write "COACH:" feedback.`,
+    auto_cold:`You are Mike, a busy no-nonsense auto shop owner. A rep just walked in. Start with "Yeah what can I do for you?" Be direct and skeptical. After each rep message reply as Mike (2-3 sentences) then write "COACH:" — did they lead with dollar amounts? Were they direct enough?`,
+    auto_busy:`You are Mike, extremely busy with a car on the lift. Start with "Look I'm right in the middle of something, make it fast." After each rep message reply as Mike then write "COACH:" — did they respect your time while still pushing?`,
+    retail_cold:`You are Sandra, a retail store owner behind the counter. A rep just walked in during a quiet moment. Start with "Can I help you with something?" Be polite but cautious. After each rep message reply as Sandra then write "COACH:" — did they use the volume/transaction angle?`,
+    retail_lease:`You are Sandra who believes she can't switch because her terminal is leased. Start with "I can't switch — my equipment is leased." After each rep message reply as Sandra then write "COACH:" feedback on how they handled the lease objection.`,
+    service_cold:`You are Jennifer, a salon owner between clients. A rep just walked in. Start with "Hi! Do you have an appointment?" Be warm but busy. After each rep message reply as Jennifer then write "COACH:" — did they mention tips? Did they build rapport first?`,
+    service_flat:`You are Jennifer who is on a flat rate plan and thinks it's simple. Start with "I'm on a flat rate plan, it's easy and I like it." After each rep message reply as Jennifer then write "COACH:" — did they educate on flat rate costs for salons?`,
+  },
+  bdr:{
+    cold:`You are Tony, a very busy auto shop owner who just answered a cold call. Skeptical and short on time. Start with "Yeah, who's this?" Be resistant — but if the BDR is persistent and confident, slowly warm up. Goal: BDR gets you to send your processing statement. After each message: reply as Tony (2-3 sentences) then write "COACH:" — rate persistence 1-10, did they ask for the statement, one specific improvement.`,
+    busy:`You are Tony, extremely busy. Start with "Look I'm slammed, can't talk." Keep saying you're busy. Only consider committing if BDR is relentless. After each message write "COACH:" — rate persistence 1-10.`,
+    happy:`You are Tony, happy with his processor. Start with "I'm good, happy with who I have." Push back at least 3 times. After each message write "COACH:" — did they challenge the objection aggressively? Did they keep asking for the statement?`,
+    switched:`You are Tony who switched 2 months ago. Start with "We just switched not too long ago." Be skeptical. After each message write "COACH:" — did they use the 'perfect timing / verify you got a deal' angle?`,
+    notinterested:`You are Tony, not interested at all. Start with "I'm really not interested." Only budge after 3+ strong pushes. After each message write "COACH:" — rate persistence 1-10. Did they beg? Did they make a compelling case?`,
+    brother:`You are Tony whose brother handles finances. Start with "My brother handles all that." Be vague about contact info. After each message write "COACH:" — did they push for the brother's number? Did they try to get Tony to send the statement anyway?`,
+    zerofee:`You are Tony, an auto shop owner on a cash discount program — meaning your customers pay a small service fee so you pay $0 in processing costs. This is real and you know it. Start with "Yeah we don't pay anything — we're on a cash discount program." Be confident because you ARE right. Only soften if the BDR takes the RIGHT angle: checking whether hidden fees (equipment lease, PCI fees, monthly minimums) are eating into that $0, OR whether the program is set up compliantly. Do NOT respond positively if they try to tell you cash discount isn't real or that you're passing fees to customers wrongly — push back hard. After each BDR message write "COACH:" — did they validate the cash discount instead of arguing it? Did they use the hidden fees or compliance angle? Did they still ask for the statement?`
+  }
+};
+
+let state={
+  field:{scenario:'restaurant_cold',history:[],loading:false},
+  bdr:{scenario:'cold',history:[],loading:false}
+};
+
+function setScenario(prog,sc,btn){
+  state[prog].scenario=sc;
+  btn.closest('.scenario-bar').querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active','active-auto','active-retail','active-service','active-bdr'));
+  const biz=sc.split('_')[0];
+  const activeClass=prog==='bdr'?'active-bdr':biz==='auto'?'active-auto':biz==='retail'?'active-retail':biz==='service'?'active-service':'active';
+  btn.classList.add(activeClass);
+  if(prog==='field' && personas[sc]){
+    const pill=document.getElementById('fieldPersonaPill');
+    pill.textContent=personas[sc].pill;
+    pill.className='persona-pill '+personas[sc].cls;
+  }
+  resetChat(prog);
+}
+
+function resetChat(prog){
+  state[prog].history=[];
+  document.getElementById(prog+'Chat').innerHTML='';
+  addMsg(prog,'system',prog==='field'?'Walk in and introduce yourself as the rep!':'📞 Ring ring — Tony just picked up. Go!');
+  startConvo(prog);
+}
+
+async function startConvo(prog){
+  if(!keys[prog]){addMsg(prog,'system','Enter your API key above to activate the AI role play.');return;}
+  state[prog].loading=true;setBtnDisabled(prog,true);showTyping(prog);
+  try{
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":keys[prog],"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:450,system:scenarios[prog][state[prog].scenario],messages:[{role:"user",content:"Begin."}]})});
+    const data=await resp.json();removeTyping(prog);
+    if(data.error){addMsg(prog,'system','Error: '+data.error.message);state[prog].loading=false;setBtnDisabled(prog,false);return;}
+    const text=data.content[0].text;parseAndDisplay(prog,text,true);
+    state[prog].history.push({role:"assistant",content:text});
+  }catch(e){removeTyping(prog);addMsg(prog,'system','Connection error — check your API key.');}
+  state[prog].loading=false;setBtnDisabled(prog,false);
+}
+
+async function sendMsg(prog){
+  if(state[prog].loading)return;
+  if(!keys[prog]){addMsg(prog,'system','Please enter your API key first.');return;}
+  const input=document.getElementById(prog+'Input');
+  const text=input.value.trim();if(!text)return;
+  input.value='';
+  addMsg(prog,prog==='bdr'?'rep-bdr':'rep',text);
+  state[prog].history.push({role:"user",content:text});
+  state[prog].loading=true;setBtnDisabled(prog,true);showTyping(prog);
+  try{
+    const msgs=[{role:"user",content:"Begin."},...state[prog].history];
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":keys[prog],"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-haiku-4-5-20251001",max_tokens:450,system:scenarios[prog][state[prog].scenario],messages:msgs})});
+    const data=await resp.json();removeTyping(prog);
+    if(data.error){addMsg(prog,'system','Error: '+data.error.message);state[prog].loading=false;setBtnDisabled(prog,false);return;}
+    const reply=data.content[0].text;parseAndDisplay(prog,reply,false);
+    state[prog].history.push({role:"assistant",content:reply});
+  }catch(e){removeTyping(prog);addMsg(prog,'system','Connection error.');}
+  state[prog].loading=false;setBtnDisabled(prog,false);
+}
+
+function parseAndDisplay(prog,text,isFirst){
+  const parts=text.split(/\nCOACH:/i);
+  const custPart=parts[0].trim();const coachPart=parts[1]?parts[1].trim():null;
+  if(custPart)addMsg(prog,'customer',custPart);
+  if(coachPart&&!isFirst){
+    const area=document.getElementById(prog+'Chat');
+    const div=document.createElement('div');div.className='msg coach';
+    div.innerHTML='<div class="coach-label">Coach feedback</div>'+coachPart;
+    area.appendChild(div);area.scrollTop=99999;
+  }
+}
+function addMsg(prog,type,text){
+  const area=document.getElementById(prog+'Chat');
+  const div=document.createElement('div');div.className='msg '+type;div.textContent=text;
+  area.appendChild(div);area.scrollTop=99999;
+}
+function showTyping(prog){
+  const area=document.getElementById(prog+'Chat');
+  const div=document.createElement('div');div.className='typing';div.id=prog+'Typing';
+  div.innerHTML='<span></span><span></span><span></span>';
+  area.appendChild(div);area.scrollTop=99999;
+}
+function removeTyping(prog){const t=document.getElementById(prog+'Typing');if(t)t.remove();}
+function setBtnDisabled(prog,val){const b=document.getElementById(prog+'SendBtn');if(b)b.disabled=val;}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  try{
+    const fk=localStorage.getItem('key_field');if(fk){keys.field=fk;document.getElementById('fieldApiKey').value=fk;setStatus('field','Key loaded — ready!','ok');}
+    const bk=localStorage.getItem('key_bdr');if(bk){keys.bdr=bk;document.getElementById('bdrApiKey').value=bk;setStatus('bdr','Key loaded — ready!','ok');}
+  }catch(e){}
+  resetChat('field');
+});
+</script>
+</body>
+</html>
